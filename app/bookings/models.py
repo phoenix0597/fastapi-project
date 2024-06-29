@@ -1,4 +1,5 @@
 from sqlalchemy import Column, Integer, ForeignKey, Date, Computed
+from sqlalchemy.ext.hybrid import hybrid_property
 from app.database import Base
 
 
@@ -10,5 +11,6 @@ class Bookings(Base):
     user_id = Column(ForeignKey("users.id"), nullable=False)
     date_from = Column(Date, nullable=False)
     date_to = Column(Date, nullable=False)
-    total_cost = Column(Integer, Computed("(date_to - date_from) * room.price"))
+    price = Column(Integer, nullable=False)
+    total_cost = Column(Integer, Computed("(date_to - date_from) * price"))
     total_days = Column(Integer, Computed("date_to - date_from"))
