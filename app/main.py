@@ -4,7 +4,10 @@ from typing import Optional
 from datetime import date
 from pydantic import BaseModel
 
+from app.bookings.router import router as router_bookings
+
 app = FastAPI()
+app.include_router(router_bookings)
 
 
 class HotelSchema(BaseModel):
@@ -30,7 +33,7 @@ class HotelsSearchArgs:
 
 
 @app.get("/hotels")
-async def get_hotels(search_args: HotelsSearchArgs = Depends()):
+async def get_hotels(search_args: HotelsSearchArgs = Depends()) -> list[HotelSchema]:
     hotels = [
         {
             "address": "ул. Пушкина, д. Колотушкина, 1",
@@ -43,7 +46,7 @@ async def get_hotels(search_args: HotelsSearchArgs = Depends()):
             "stars": 5,
         },
     ]
-    return search_args  # "Bridge Resort Hotel 5 stars"
+    return hotels  # "Bridge Resort Hotel 5 stars"
 
 
 class BookingSchema(BaseModel):
