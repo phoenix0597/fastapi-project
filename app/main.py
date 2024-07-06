@@ -5,8 +5,11 @@ from datetime import date
 from pydantic import BaseModel
 
 from app.bookings.router import router as router_bookings
+from app.users.router import router as router_users
+from app.bookings.schemas import BookingSchema
 
 app = FastAPI()
+app.include_router(router_users)
 app.include_router(router_bookings)
 
 
@@ -49,10 +52,10 @@ async def get_hotels(search_args: HotelsSearchArgs = Depends()) -> list[HotelSch
     return hotels  # "Bridge Resort Hotel 5 stars"
 
 
-class BookingSchema(BaseModel):
-    room_id: int
-    date_from: date
-    date_to: date
+# class BookingSchema(BaseModel):
+#     room_id: int
+#     date_from: date
+#     date_to: date
 
 
 @app.post("/bookings")

@@ -1,6 +1,9 @@
-from fastapi import APIRouter
-from app.bookings.dao import BookingDAO
+from fastapi import APIRouter, Request, Depends
 
+from app.bookings.dao import BookingDAO
+from app.bookings.schemas import BookingSchema
+from app.users.dependencies import get_current_user
+from app.users.models import Users
 
 router = APIRouter(
     prefix="/bookings",
@@ -8,13 +11,9 @@ router = APIRouter(
 )
 
 
-@router.get("/")                                      # 1) нет аннотации responce model (не валидируем ответ клиенту)
-async def get_bookings():                             # 2) не формируем ответ для конкретного пользователя (нет фильтра)
-    # async with async_session_maker() as session:    # 3) в эндпоинте находится взаимодействие с БД - это неправильно -
-    #     query = select(Bookings)                    # в соответствии с архитектурным паттерном MVC заменить на:
-    #     result = await session.execute(query)       # result = BookingServise.get_all_bookings()
-    #     print(result.mappings().all())
-    #     return result.mappings().all()              # return result
-    result = await BookingDAO.find_all()
-    # result = await BookingDAO.find_by_id(1)
+@router.get("/")  # , response_model=List[BookingSchema], response_model=list[BookingSchema])
+async def get_bookings(user: Users = Depends(get_current_user)):
+    print(user, type(user), user.id, user.email)
+    result = await BookingDAO.find_all(user_id=user.id)
     return result
+    # return user

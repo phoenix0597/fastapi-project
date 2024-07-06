@@ -1,5 +1,5 @@
 from app.database import Base
-from app.config import settings
+from app.config import s
 from app.hotels.models import Hotels
 from app.users.models import Users
 from app.rooms.models import Rooms
@@ -22,7 +22,7 @@ sys.path.insert(0, dirname(dirname(dirname(abspath(__file__)))))
 config = context.config
 
 # т.к. alembic синхронный, а наше подключение асинхронное, необходимо указать async_fallback=True в параметре
-config.set_main_option("sqlalchemy.url", f"{settings.DATABASE_URL}")
+config.set_main_option("sqlalchemy.url", f"{s.DATABASE_URL}")
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.

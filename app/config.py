@@ -1,3 +1,4 @@
+from pydantic import model_validator
 from pydantic_settings import BaseSettings
 from os.path import abspath, dirname, join
 
@@ -14,12 +15,19 @@ class Settings(BaseSettings):
     DB_PASS: str
     DATABASE_URL: str = ""
     
+    SECRET_KEY: str
+    ALGORITHM: str
+    
+    @model_validator(mode="after")
+    def get_database_url(self):
+        self.DATABASE_URL = (
+            f"postgresql+asyncpg://{self.DB_USER}:{self.DB_PASS}"
+            f"@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}?async_fallback=True"
+        )
+        return self
+    
     class Config:
         env_file = ENV_FILE
-
+    
 
 settings = Settings()
-settings.DATABASE_URL = \
-    f"postgresql+asyncpg://{settings.DB_USER}:{settings.DB_PASS}@{settings.DB_HOST}:{settings.DB_PORT}/{settings.DB_NAME}?async_fallback=True"
-
-print(settings.DATABASE_URL)
