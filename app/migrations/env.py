@@ -1,9 +1,5 @@
 from app.database import Base
 from app.config import s
-from app.hotels.models import Hotels
-from app.users.models import Users
-from app.rooms.models import Rooms
-from app.bookings.models import Bookings
 
 import sys
 from os.path import abspath, dirname
