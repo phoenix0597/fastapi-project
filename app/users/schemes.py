@@ -6,4 +6,5 @@ class UserAuthSchema(BaseModel):
     password: str
     
     class Config:
-        orm_model = True
+        # orm_model = True
+        from_attributes = True

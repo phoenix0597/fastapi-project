@@ -13,4 +13,5 @@ class BookingSchema(BaseModel):
     total_days: int
     
     class Config:
-        orm_mode = True  # Используйте 'from_attributes' вместо 'orm_mode'
+        # orm_mode = True  # Используйте 'from_attributes' вместо 'orm_mode'
+        from_attributes = True  # Используйте 'from_attributes' вместо 'orm_mode'7

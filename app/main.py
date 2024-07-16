@@ -7,14 +7,18 @@ from app.bookings.router import router as router_bookings
 from app.users.router import router as router_users
 from app.hotels.router import router as router_hotels
 from app.pages.router import router as router_pages
+from app.images.router import router as router_images
+from app.config import BASE_DIR
+
+print(BASE_DIR)
 
 app = FastAPI()
-
-app.mount("/static", StaticFiles(directory="app/static"), name="static")
+app.mount("/static", StaticFiles(directory=os.path.join(BASE_DIR, "app", "static")), name="static")
 app.include_router(router_users)
 app.include_router(router_bookings)
 app.include_router(router_hotels)
 app.include_router(router_pages)
+app.include_router(router_images)
 
 
 if __name__ == "__main__":
