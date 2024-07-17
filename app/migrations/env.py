@@ -1,5 +1,5 @@
 from app.database import Base
-from app.config import s
+from app.config import settings as s
 
 import sys
 from os.path import abspath, dirname

@@ -24,7 +24,7 @@ async def get_hotels_by_location_and_time(
     if (date_to - date_from).days > 31:
         raise CannotBookHotelForLongPeriod
     hotels = await HotelDAO.find_all(location, date_from, date_to)
-    
+
     return hotels
 
 

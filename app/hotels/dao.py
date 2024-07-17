@@ -67,12 +67,17 @@ class HotelDAO(BaseDAO):
         async with async_session_maker() as session:
             result = await session.execute(hotels_query)
             hotels_list = result.mappings().all()
-            
-            # Преобразуем данные
+
             formatted_hotels = [
-                {'name': hotel['Hotels'].name, 'location': hotel['Hotels'].location} for hotel in hotels_list
+                {
+                    'name': hotel['Hotels'].name,
+                    'location': hotel['Hotels'].location,
+                    'image_id': hotel['Hotels'].image_id,
+                    'rooms_left': int(hotel['rooms_left'])  # Преобразуем Decimal в int
+                } for hotel in hotels_list
             ]
-            
+
+
             # Выводим для отладки
             for hotel in formatted_hotels:
                 print(f"Hotel Name: {hotel['name']}, Location: {hotel['location']}")
