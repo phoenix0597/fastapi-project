@@ -5,7 +5,7 @@ from app.config import BASE_DIR
 from app.tasks.tasks import process_pic
 
 router = APIRouter(
-    prefix="/imsges",
+    prefix="/images",
     tags=["Images download"],
 )
 
