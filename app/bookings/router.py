@@ -1,12 +1,19 @@
 from datetime import date
 
 from fastapi import APIRouter, Depends
+from pydantic import TypeAdapter
+# from pydantic import parse_obj_as
+
 
 from app.bookings.dao import BookingDAO
 from app.bookings.schemas import BookingSchema
 from app.exceptions import RoomCannotBeBookedException
 from app.users.dependencies import get_current_user
 from app.users.models import Users
+from app.tasks.tasks import send_booking_confirmation_email
+
+# Создаем TypeAdapter для схемы BookingSchema
+booking_schema_adapter = TypeAdapter(BookingSchema)
 
 router = APIRouter(
     prefix="/bookings",
@@ -28,4 +35,11 @@ async def add_booking(room_id: int, date_from: date, date_to: date, user: Users 
     if not new_booking:
         raise RoomCannotBeBookedException
 
-    return {"message": "Successfully added booking"}
+    # booking_dict = parse_obj_as(BookingSchema, new_booking).dict()
+
+    # Используем TypeAdapter для валидации данных
+    booking_dict = booking_schema_adapter.validate_python(new_booking).model_dump()
+    send_booking_confirmation_email.delay(booking_dict, user.email)
+
+    # return {"message": "Successfully added booking"}
+    return booking_dict

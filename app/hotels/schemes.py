@@ -3,6 +3,10 @@ from pydantic import BaseModel
 
 
 class HotelSchema(BaseModel):
-    address: str
+    # address: str
+    location: str  # Изменили address на location
     name: str
-    stars: Optional[int]
+    stars: Optional[int] = None
+    image_id: int
+    rooms_left: int
+    services: Optional[list[str]] = None

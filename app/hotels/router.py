@@ -1,6 +1,8 @@
+import asyncio
 from datetime import date, datetime, timedelta
 from typing import Optional
 from fastapi import APIRouter, Query
+from fastapi_cache.decorator import cache
 
 from app.exceptions import DateFromCannotBeAfterDateTo, CannotBookHotelForLongPeriod
 from app.hotels.dao import HotelDAO
@@ -13,6 +15,7 @@ router = APIRouter(
 
 
 @router.get("/{location}/search")
+@cache(expire=20)
 async def get_hotels_by_location_and_time(
     location: str,
     date_from: date = Query(..., description=f"Например, {datetime.now().date()}"),
@@ -23,6 +26,7 @@ async def get_hotels_by_location_and_time(
         raise DateFromCannotBeAfterDateTo
     if (date_to - date_from).days > 31:
         raise CannotBookHotelForLongPeriod
+    await asyncio.sleep(3)
     hotels = await HotelDAO.find_all(location, date_from, date_to)
 
     return hotels

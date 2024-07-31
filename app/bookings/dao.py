@@ -62,6 +62,7 @@ class BookingDAO(BaseDAO):
                     date_to=date_to,
                     price=price
                 ).returning(Bookings)
+
                 new_booking = await session.execute(add_booking_query)
                 await session.commit()
                 return new_booking.scalar()

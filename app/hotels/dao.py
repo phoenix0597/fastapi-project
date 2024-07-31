@@ -73,7 +73,8 @@ class HotelDAO(BaseDAO):
                     'name': hotel['Hotels'].name,
                     'location': hotel['Hotels'].location,
                     'image_id': hotel['Hotels'].image_id,
-                    'rooms_left': int(hotel['rooms_left'])  # Преобразуем Decimal в int
+                    'rooms_left': int(hotel['rooms_left']),  # Преобразуем Decimal в int
+                    "services": hotel['Hotels'].services,
                 } for hotel in hotels_list
             ]
 
