@@ -35,7 +35,7 @@ def send_booking_confirmation_email(
 
     with smtplib.SMTP_SSL(settings.SMTP_HOST, settings.SMTP_PORT) as server:
         server.login(settings.SMTP_USER, settings.SMTP_PASS)
-        server.send_message(msg_content)\
+        server.send_message(msg_content)
 
 # ---------------------------
 # запуск celery в консоли:
