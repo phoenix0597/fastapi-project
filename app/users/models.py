@@ -1,4 +1,5 @@
 from sqlalchemy import Column, Integer, String, Boolean
+from sqlalchemy.orm import relationship
 from app.database import Base
 
 
@@ -9,3 +10,8 @@ class Users(Base):
     email = Column(String, nullable=False)
     hashed_password = Column(String, nullable=False)
     # is_admin = Column(Boolean, default=False)
+
+    booking = relationship("Bookings", back_populates="user")
+
+    def __repr__(self):
+        return f"Пользователь {self.email})"

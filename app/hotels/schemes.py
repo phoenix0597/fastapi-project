@@ -1,5 +1,5 @@
 from typing import Optional
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 
 class HotelSchema(BaseModel):
@@ -10,3 +10,5 @@ class HotelSchema(BaseModel):
     image_id: int
     rooms_left: int
     services: Optional[list[str]] = None
+
+    model_config = ConfigDict(arbitrary_types_allowed=True)

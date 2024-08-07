@@ -17,3 +17,4 @@ celery_app.conf.update(
 
 # Запуск приложения Celery в консоли (для текущей структуры проекта):
 # celery -A app.tasks.celery_config:celery_app worker --loglevel=INFO --pool=solo
+# celery -A app.tasks.celery_config:celery_app flower

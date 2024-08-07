@@ -13,14 +13,20 @@ from fastapi_cache.backends.redis import RedisBackend
 
 from redis import asyncio as aioredis
 
+from sqladmin import Admin
+
+from app.adminpanel.auth import authentication_backend
+from app.adminpanel.views import UsersAdmin, BookingsAdmin, HotelsAdmin, RoomsAdmin
 from app.bookings.router import router as router_bookings
 from app.users.router import router as router_users
 from app.hotels.router import router as router_hotels
 from app.pages.router import router as router_pages
 from app.images.router import router as router_images
 from app.config import BASE_DIR, settings
+from app.database import engine
 
-print(BASE_DIR)
+
+# print(BASE_DIR)
 
 
 @asynccontextmanager
@@ -42,6 +48,13 @@ app.include_router(router_hotels)
 app.include_router(router_pages)
 app.include_router(router_images)
 
+admin = Admin(app, engine, authentication_backend=authentication_backend)
+
+admin.add_view(UsersAdmin)
+admin.add_view(BookingsAdmin)
+admin.add_view(HotelsAdmin)
+admin.add_view(RoomsAdmin)
+
 origins = [
     "http://localhost:3000",
 ]
@@ -55,10 +68,13 @@ app.add_middleware(
                    "Access-Control-Allow-Origin", "Authorization"],
 )
 
-
 if __name__ == "__main__":
     uvicorn.run("main:app", host="127.0.0.1", port=8088, reload=True)
-    # uvicorn main:app --reload  # this is alternative command in cmd from project root directory
+    # uvicorn app.main:app --reload  # this is alternative command in cmd from project root directory
+
+    # Запуск приложений Celery и Flower в консоли (для текущей структуры проекта):
+    # celery -A app.tasks.celery_config:celery_app worker --loglevel=INFO --pool=solo
+    # celery -A app.tasks.celery_config:celery_app flower
 
 # Так пишут тесты
 # import requests
