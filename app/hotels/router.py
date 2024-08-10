@@ -34,6 +34,7 @@ async def get_hotels_by_location_and_time(
         print(f"Error in get_hotels_by_location_and_time: {e}")
         raise
 
+
 @router.get("/id/{hotel_id}", include_in_schema=True)
 # Этот эндпоинт используется для фронтенда, когда мы хотим отобразить все номера в отеле
 # и информацию о самом отеле. Этот эндпоинт как раз отвечает за информацию об отеле.

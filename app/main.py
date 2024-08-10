@@ -34,7 +34,7 @@ async def lifespan(_: FastAPI) -> AsyncIterator[None]:
     redis = aioredis.from_url(
         f"redis://{settings.REDIS_HOST}:{settings.REDIS_PORT}",
         encoding="utf8",
-        decode_responses=True
+        # decode_responses=True
     )
     FastAPICache.init(RedisBackend(redis), prefix="fastapi-cache")
     yield
@@ -70,7 +70,7 @@ app.add_middleware(
 
 if __name__ == "__main__":
     uvicorn.run("main:app", host="127.0.0.1", port=8088, reload=True)
-    # uvicorn app.main:app --reload  # this is alternative command in cmd from project root directory
+    # uvicorn app.main:app --port 8088 --reload  # this is alternative command in cmd from project root directory
 
     # Запуск приложений Celery и Flower в консоли (для текущей структуры проекта):
     # celery -A app.tasks.celery_config:celery_app worker --loglevel=INFO --pool=solo
