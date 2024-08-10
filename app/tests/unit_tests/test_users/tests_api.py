@@ -1,27 +1,38 @@
 import asyncio
-
 import pytest
 
-from app.config import settings  # для отладочного сообщения
-# pytest_plugins = ['pytest_asyncio']
+from httpx import AsyncClient
 
 
-@pytest.mark.asyncio
-async def test_abc(prepare_database):
-    # print(f"{settings.MODE=}")  # Отладочное сообщение
-    # print("\ntest_abc is running...")
-    assert 1 == 1
+@pytest.mark.parametrize("email, password, status_code", [
+    ("XJqFP@example.com", "test", 200),
+    ("XJqFP@example.com", "wrong", 409),
+    ("wrong", "test", 422),
+])
+async def test_register_user(async_client: AsyncClient, email: str, password: str, status_code: int):
+    response = await async_client.post(
+        "/auth/register",
+        json={
+            "email": email,
+            "password": password,
+        }
+    )
+    # print(f"{response.status_code=}, {response.text=}, {response.url=}")
+    assert response.status_code == status_code
 
 
-@pytest.mark.asyncio
-async def test_fixture_execution(prepare_database):
-    # print("\ntest_fixture_execution is running...")
-    assert True  # Просто проверяем, что фикстура вызывается
-
-
-@pytest.mark.asyncio
-async def test_async_execution():
-    # print("Before sleep")
-    await asyncio.sleep(1)
-    # print("After sleep")
-    assert True
+@pytest.mark.parametrize("email, password, status_code", [
+    ("test@test.com", "test", 200),
+    ("artem@example.com", "artem", 200),
+    ("wrong@person.com", "somepwd", 401),
+])
+async def test_login_user(async_client: AsyncClient, email: str, password: str, status_code: int):
+    response = await async_client.post(
+        "/auth/login",
+        json={
+            "email": email,
+            "password": password,
+        }
+    )
+    # print(f"{response.status_code=}, {response.text=}, {response.url=}")
+    assert response.status_code == status_code
