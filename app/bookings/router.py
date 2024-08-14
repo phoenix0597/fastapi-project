@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, timedelta
 
 from fastapi import APIRouter, Depends, status, BackgroundTasks
 from pydantic import TypeAdapter
@@ -36,10 +36,10 @@ async def add_booking(room_id: int, date_from: date, date_to: date, user: Users 
     elif date_from < date.today():
         status_code = status.HTTP_400_BAD_REQUEST
         raise CannotBookHotelBeforeTodayException
-    elif date_to - date_from > 30:
+    elif date_to - date_from > timedelta(days=30):
         status_code = status.HTTP_400_BAD_REQUEST
         raise CannotBookHotelForLongPeriodException
-    elif date_to - date_from < 30:
+    elif date_to - date_from < timedelta(days=30):
 
         new_booking = await BookingDAO.add(user.id, room_id, date_from, date_to)
         if not new_booking:

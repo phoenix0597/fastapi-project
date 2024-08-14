@@ -27,7 +27,7 @@ async def test_add_and_get_booking():
     # user_id = new_booking.user_id
     new_booking_id = new_booking.id
     # Deleting created booking
-    await BookingDAO.delete(new_booking_id)
+    await BookingDAO.delete(id=new_booking_id)
 
     # Check that new booking was deleted successfully
     new_booking = await BookingDAO.find_by_id(new_booking_id)
