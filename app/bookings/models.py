@@ -20,4 +20,4 @@ class Bookings(Base):
     user = relationship("Users", back_populates="booking")
 
     def __repr__(self):
-        return (f"Бронь №{self.id} комнаты №{self.room_id} с {self.date_from} по {self.date_to})")
+        return (f"Бронь №{self.id} комнаты №{self.room_id} с {self.date_from} по {self.date_to}")

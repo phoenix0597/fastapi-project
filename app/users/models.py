@@ -14,4 +14,4 @@ class Users(Base):
     booking = relationship("Bookings", back_populates="user")
 
     def __repr__(self):
-        return f"Пользователь {self.email})"
+        return f"Пользователь {self.email}"

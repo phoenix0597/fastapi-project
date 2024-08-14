@@ -1,5 +1,5 @@
-# DAO - Data Access Object / repo (repository) / service - названия, которые можно давать этому файлу
-# это термины, отражающие названия паттерна, который реализует отделение БД от бизнес логики
+# DAO - Data Access Object / repo (repository) / service - названия, которые можно давать этому файлу.
+# Это термины, отражающие названия паттерна, который реализует отделение БД от бизнес логики
 from datetime import date
 
 from sqlalchemy import or_, not_, func, select, insert, and_

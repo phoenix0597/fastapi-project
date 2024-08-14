@@ -1,6 +1,6 @@
-import asyncio
+# import asyncio
 import json
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import pytest
 from sqlalchemy import insert
@@ -51,10 +51,10 @@ async def prepare_database():
         await session.execute(insert(Bookings).values(bookings))
         await session.commit()
 
-    yield "Database prepared"
-    await asyncio.sleep(0)
-
     print("\nDatabase prepared.")  # Отладочное сообщение
+    yield "Database prepared"
+    # await asyncio.sleep(0)
+
 
 
 @pytest.fixture(scope="function")
@@ -63,6 +63,32 @@ async def async_client():
     async with AsyncClient(transport=transport, base_url="http://test") as ac:
         yield ac
 
-# пример использование в тесте предыдущей фикстуры
-# async def test_abc(ac):
-#     await ac.get("/")
+
+@pytest.fixture(scope="session")
+async def authenticated_async_client():
+    transport = ASGITransport(app=fastapi_app)
+    async with AsyncClient(transport=transport, base_url="http://test") as ac:
+        await ac.post("/auth/login", json={"email": "test@test.com", "password": "test",})
+        assert ac.cookies["booking_access_token"]
+        print(f"{ac.cookies["booking_access_token"]=}")
+        yield ac
+
+
+@pytest.fixture(scope="function")
+async def async_client():
+    transport = ASGITransport(app=fastapi_app)
+    async with AsyncClient(transport=transport, base_url="http://test") as ac:
+        yield ac
+
+
+@pytest.fixture
+def setup_dates():
+    """Фикстура для генерации разных дат"""
+    today = datetime.now().date()
+    return {
+        "today": today,
+        "date_soon": today + timedelta(days=1),
+        "date_later": today + timedelta(days=31),
+        "date_far_later": today + timedelta(days=32),
+        "date_before_today": today - timedelta(days=1),
+    }

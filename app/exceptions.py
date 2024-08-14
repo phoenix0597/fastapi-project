@@ -40,15 +40,19 @@ class UserNotFoundException(BookingException):
 
 
 class RoomCannotBeBookedException(BookingException):
-    status_code = status.HTTP_400_BAD_REQUEST
+    status_code = status.HTTP_409_CONFLICT
     detail = "No rooms available for booking"
 
 
-class DateFromCannotBeAfterDateTo(BookingException):
+class DateFromCannotBeAfterDateToException(BookingException):
     status_code = status.HTTP_400_BAD_REQUEST
-    detail = "Date from cannot be after date to"
+    detail = "Date from cannot be equal or after date to"
 
 
-class CannotBookHotelForLongPeriod(BookingException):
+class CannotBookHotelForLongPeriodException(BookingException):
     status_code = status.HTTP_400_BAD_REQUEST
-    detail = "Cannot book hotel for long period"
+    detail = "Cannot book hotel for long (more than 30 days) period"
+
+class CannotBookHotelBeforeTodayException(BookingException):
+    status_code = status.HTTP_400_BAD_REQUEST
+    detail = "Cannot book hotel before today"

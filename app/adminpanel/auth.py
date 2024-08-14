@@ -1,4 +1,6 @@
-from sqladmin import Admin
+# from sqladmin import Admin
+from typing import Optional
+
 from sqladmin.authentication import AuthenticationBackend
 from starlette.requests import Request
 from starlette.responses import RedirectResponse
@@ -26,11 +28,19 @@ class AdminAuth(AuthenticationBackend):
         request.session.clear()
         return True
 
-    async def authenticate(self, request: Request) -> bool:
+    async def authenticate(self, request: Request) -> Optional[RedirectResponse]:
         token = request.session.get("token")
 
-        if not token or not await get_current_user(token):
-            return False
+        if not token:
+            return RedirectResponse(request.url_for("admin:login"), status_code=302)
+        try:
+            user = await get_current_user(token)
+        except Exception as e:
+            print(e)
+            return RedirectResponse(request.url_for("admin:login"), status_code=302)
+
+        if not user:
+            return RedirectResponse(request.url_for("admin:login"), status_code=302)
 
         return True
 
