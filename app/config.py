@@ -1,8 +1,8 @@
+from os.path import abspath, dirname, join
 from typing import Literal
 
-from pydantic import model_validator, ConfigDict
+from pydantic import ConfigDict, model_validator
 from pydantic_settings import BaseSettings
-from os.path import abspath, dirname, join
 
 # Определяем путь к файлу .env
 BASE_DIR = dirname(dirname(abspath(__file__)))

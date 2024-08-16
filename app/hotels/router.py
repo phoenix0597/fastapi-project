@@ -1,11 +1,15 @@
 import asyncio
 from datetime import date, datetime, timedelta
 from typing import Optional
+
 from fastapi import APIRouter, Query
 from fastapi_cache.decorator import cache
 
-from app.exceptions import DateFromCannotBeAfterDateToException, CannotBookHotelForLongPeriodException, \
-    CannotBookHotelBeforeTodayException
+from app.exceptions import (
+    CannotBookHotelBeforeTodayException,
+    CannotBookHotelForLongPeriodException,
+    DateFromCannotBeAfterDateToException,
+)
 from app.hotels.dao import HotelDAO
 from app.hotels.schemes import HotelSchema
 

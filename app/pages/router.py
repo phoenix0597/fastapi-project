@@ -1,13 +1,12 @@
 import os
 from datetime import date, datetime
 
-from fastapi import APIRouter, Request, Depends
-from fastapi.templating import Jinja2Templates
+from fastapi import APIRouter, Depends, Query, Request
 from fastapi.responses import HTMLResponse
-from fastapi import Query
+from fastapi.templating import Jinja2Templates
 
-from app.hotels.router import get_hotels_by_location_and_time
 from app.config import BASE_DIR
+from app.hotels.router import get_hotels_by_location_and_time
 
 router = APIRouter(
     prefix="/pages",

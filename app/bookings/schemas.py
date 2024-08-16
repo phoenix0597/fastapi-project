@@ -1,5 +1,6 @@
-from pydantic import BaseModel, ConfigDict
 from datetime import date
+
+from pydantic import BaseModel, ConfigDict
 
 
 class BookingSchema(BaseModel):

@@ -1,6 +1,8 @@
-from fastapi import UploadFile, APIRouter
-import shutil
 import os
+import shutil
+
+from fastapi import APIRouter, UploadFile
+
 from app.config import BASE_DIR
 from app.tasks.tasks import process_pic
 

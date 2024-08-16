@@ -1,16 +1,22 @@
 from datetime import date, timedelta
 
-from fastapi import APIRouter, Depends, status, BackgroundTasks
+from fastapi import APIRouter, BackgroundTasks, Depends, status
 from pydantic import TypeAdapter
-# from pydantic import parse_obj_as
 
 from app.bookings.dao import BookingDAO
 from app.bookings.schemas import BookingSchema
-from app.exceptions import (RoomCannotBeBookedException, CannotBookHotelForLongPeriodException,
-                            CannotBookHotelBeforeTodayException, DateFromCannotBeAfterDateToException)
+from app.exceptions import (
+    CannotBookHotelBeforeTodayException,
+    CannotBookHotelForLongPeriodException,
+    DateFromCannotBeAfterDateToException,
+    RoomCannotBeBookedException,
+)
+from app.tasks.tasks import send_booking_confirmation_email
 from app.users.dependencies import get_current_user
 from app.users.models import Users
-from app.tasks.tasks import send_booking_confirmation_email
+
+# from pydantic import parse_obj_as
+
 
 # Создаем TypeAdapter для схемы BookingSchema
 booking_schema_adapter = TypeAdapter(BookingSchema)
