@@ -47,7 +47,8 @@ async def add_booking(room_id: int, date_from: date, date_to: date, user: Users 
         raise CannotBookHotelForLongPeriodException
     elif date_to - date_from < timedelta(days=30):
 
-        new_booking = await BookingDAO.add(user.id, room_id, date_from, date_to)
+        # new_booking = await BookingDAO.add(user.id, room_id, date_from, date_to)
+        new_booking = await BookingDAO.add(user_id=user.id, room_id=room_id, date_from=date_from, date_to=date_to)
         if not new_booking:
             raise RoomCannotBeBookedException
 

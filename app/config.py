@@ -11,6 +11,8 @@ ENV_FILE = join(BASE_DIR, ".env")
 
 class Settings(BaseSettings):
     MODE: Literal["DEV", "TEST", "PROD"]
+    LOG_LEVEL: Literal["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
+    SENTRY_DSN: str
 
     DB_HOST: str
     DB_PORT: int
@@ -23,8 +25,7 @@ class Settings(BaseSettings):
     def get_database_url(self):
         self.DATABASE_URL = (
             f"postgresql+asyncpg://{self.DB_USER}:{self.DB_PASS}"
-            # f"@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}?async_fallback=True"
-            f"@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
+            f"@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}?async_fallback=True"
         )
         return self
 

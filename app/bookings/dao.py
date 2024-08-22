@@ -3,11 +3,13 @@
 from datetime import date
 
 from sqlalchemy import and_, func, insert, not_, or_, select
+from sqlalchemy.exc import SQLAlchemyError
 
 from app.bookings.models import Bookings
 from app.dao.base import BaseDAO
 from app.database import async_session_maker
 from app.hotels.rooms.models import Rooms
+from app.logger import logger
 
 
 class BookingDAO(BaseDAO):
@@ -34,61 +36,79 @@ class BookingDAO(BaseDAO):
         WHERE r.id = 1
         GROUP BY r.quantity
         """
-        async with async_session_maker() as session:
 
-            # Подзапрос с зарезервированными комнатами
-            booked_rooms = (
-                select(Bookings)
-                .filter(
-                    Bookings.room_id == room_id,
-                    not_(
-                        or_(
-                            Bookings.date_to <= date_from, Bookings.date_from >= date_to
+        try:
+            async with async_session_maker() as session:
+
+                # Подзапрос с зарезервированными комнатами
+                booked_rooms = (
+                    select(Bookings)
+                    .filter(
+                        Bookings.room_id == room_id,
+                        not_(
+                            or_(
+                                Bookings.date_to <= date_from, Bookings.date_from >= date_to
+                            )
+                        ),
+                    )
+                    .subquery()
+                )
+
+                # Основной запрос
+                query = (
+                    select(
+                        (Rooms.quantity - func.count(booked_rooms.c.room_id)).label(
+                            "available_rooms"
                         )
-                    ),
-                )
-                .subquery()
-            )
-
-            # Основной запрос
-            query = (
-                select(
-                    (Rooms.quantity - func.count(booked_rooms.c.room_id)).label(
-                        "available_rooms"
                     )
+                    .outerjoin(booked_rooms, Rooms.id == booked_rooms.c.room_id)
+                    .filter(Rooms.id == room_id)
+                    .group_by(Rooms.quantity)
                 )
-                .outerjoin(booked_rooms, Rooms.id == booked_rooms.c.room_id)
-                .filter(Rooms.id == room_id)
-                .group_by(Rooms.quantity)
-            )
 
-            result = await session.execute(query)
-            print(result)
-            available_rooms: int = result.scalar()
-            print(f"{available_rooms=}")
+                result = await session.execute(query)
+                # print(result)
+                available_rooms: int = result.scalar()
+                print(f"{available_rooms=}")
 
-            if available_rooms and available_rooms > 0:
-                # Получаем цену за комнату
-                get_price_query = select(Rooms.price).filter_by(id=room_id)
-                price_result = await session.execute(get_price_query)
-                price = price_result.scalar()
+                if available_rooms and available_rooms > 0:
+                # if available_rooms and available_rooms > 0:
+                    # Получаем цену за комнату
+                    get_price_query = select(Rooms.price).filter_by(id=room_id)
+                    price_result = await session.execute(get_price_query)
+                    price = price_result.scalar()
 
-                add_booking_query = (
-                    insert(Bookings)
-                    .values(
-                        user_id=user_id,
-                        room_id=room_id,
-                        date_from=date_from,
-                        date_to=date_to,
-                        price=price,
+                    add_booking_query = (
+                        insert(Bookings)
+                        .values(
+                            user_id=user_id,
+                            room_id=room_id,
+                            date_from=date_from,
+                            date_to=date_to,
+                            price=price,
+                        )
+                        .returning(Bookings)
                     )
-                    .returning(Bookings)
-                )
 
-                new_booking = await session.execute(add_booking_query)
-                await session.commit()
-                return new_booking.scalar()
+                    new_booking = await session.execute(add_booking_query)
+                    await session.commit()
+                    return new_booking.scalar()
 
+                else:
+                    print("Not enough rooms available")
+                    return None
+
+        except (SQLAlchemyError, Exception) as e:
+            if isinstance(e, SQLAlchemyError):
+                msg = "Database exception"
             else:
-                print("Not enough rooms available")
-                return None
+                msg = "Unknown exception"
+            msg += ": Cannot add booking"
+            extra = {
+                "user_id": user_id,
+                "room_id": room_id,
+                "date_from": date_from,
+                "date_to": date_to,
+            }
+            logger.error(msg, extra=extra, exc_info=True)  # также добавляем exception traceback в лог
+            return None

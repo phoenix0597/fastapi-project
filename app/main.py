@@ -1,15 +1,19 @@
 import os
+import time
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 
 import uvicorn
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi_cache import FastAPICache
 from fastapi_cache.backends.redis import RedisBackend
 from redis import asyncio as aioredis
 from sqladmin import Admin
+from fastapi_cache.decorator import cache
+
+import sentry_sdk
 
 from app.adminpanel.auth import authentication_backend
 from app.adminpanel.views import BookingsAdmin, HotelsAdmin, RoomsAdmin, UsersAdmin
@@ -20,14 +24,18 @@ from app.hotels.router import router as router_hotels
 from app.images.router import router as router_images
 from app.pages.router import router as router_pages
 from app.users.router import router as router_users
+from app.logger import logger
 
-# from fastapi_cache.decorator import cache
-
-
-
-
-
-# print(BASE_DIR)
+sentry_sdk.init(
+    dsn=settings.SENTRY_DSN,
+    # Set traces_sample_rate to 1.0 to capture 100%
+    # of transactions for tracing.
+    traces_sample_rate=1.0,
+    # Set profiles_sample_rate to 1.0 to profile 100%
+    # of sampled transactions.
+    # We recommend adjusting this value in production.
+    profiles_sample_rate=1.0,
+)
 
 
 @asynccontextmanager
@@ -38,23 +46,36 @@ async def lifespan(_: FastAPI) -> AsyncIterator[None]:
         # decode_responses=True
     )
     FastAPICache.init(RedisBackend(redis), prefix="fastapi-cache")
+    logger.info("Redis connection established", extra={"host": settings.REDIS_HOST})
     yield
 
 
 app = FastAPI(lifespan=lifespan)
-app.mount("/static", StaticFiles(directory=os.path.join(BASE_DIR, "app", "static")), name="static")
+
 app.include_router(router_users)
 app.include_router(router_bookings)
 app.include_router(router_hotels)
-app.include_router(router_pages)
 app.include_router(router_images)
+app.include_router(router_pages)
 
 admin = Admin(app, engine, authentication_backend=authentication_backend)
-
 admin.add_view(UsersAdmin)
 admin.add_view(BookingsAdmin)
 admin.add_view(HotelsAdmin)
 admin.add_view(RoomsAdmin)
+
+
+@app.middleware("http")
+async def add_process_time_header(request: Request, call_next):
+    start_time = time.time()
+    response = await call_next(request)
+    process_time = time.time() - start_time
+    # response.headers["X-Process-Time"] = str(process_time)
+    logger.info("Request execution time", extra={
+        "process_time": round(process_time, 4)
+    })
+    return response
+
 
 origins = [
     "http://localhost:3000",
@@ -69,13 +90,15 @@ app.add_middleware(
                    "Access-Control-Allow-Origin", "Authorization"],
 )
 
+app.mount("/static", StaticFiles(directory=os.path.join(BASE_DIR, "app", "static")), name="static")
+
 if __name__ == "__main__":
     uvicorn.run("main:app", host="127.0.0.1", port=8088, reload=True)
-    # uvicorn app.main:app --port 8088 --reload  # this is alternative command in cmd from project root directory
+    # 1) uvicorn app.main:app --port 8088 --reload  # this is alternative command in cmd-line from the project root directory
 
-    # Запуск приложений Celery и Flower в консоли (для текущей структуры проекта):
-    # celery -A app.tasks.celery_config:celery_app worker --loglevel=INFO --pool=solo
-    # celery -A app.tasks.celery_config:celery_app flower
+    # 2) Запуск приложений Celery и Flower в консоли (для текущей структуры проекта):
+    # 2.1) celery -A app.tasks.celery_config:celery_app worker --loglevel=INFO --pool=solo
+    # 2.2) celery -A app.tasks.celery_config:celery_app flower
 
 # Так пишут тесты
 # import requests
