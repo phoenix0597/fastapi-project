@@ -21,9 +21,10 @@ templates = Jinja2Templates(directory=os.path.join(BASE_DIR, "app", "templates")
 async def get_hotels_page(
         request: Request,
         location: str,
-        date_from: date = Query(..., description=f"Например, {datetime.now().date()} - 1 days"),
-        date_to: date =  Query(..., description=f"Например, {datetime.now().date()} + 15 days"),
+        date_from: date = Query(..., description=f"Например, {datetime.now().date()} + 2 days"),
+        date_to: date =  Query(..., description=f"Например, {datetime.now().date()} + 12 days"),
         hotels=Depends(get_hotels_by_location_and_time),
+        host_ip: str = settings.HOST_IP
 ):
     return templates.TemplateResponse(
         name="hotels.html",
@@ -33,6 +34,6 @@ async def get_hotels_page(
             "location": location,
             "date_from": date_from.strftime("%Y-%m-%d"),
             "date_to": date_to.strftime("%Y-%m-%d"),
-            "HOST_IP": settings.HOST_IP,
+            "host_ip": host_ip,
         },
     )

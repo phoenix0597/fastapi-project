@@ -140,7 +140,7 @@
         <div class="header">
             <h3>Testing Grafana Dashboard</h3>
             <p>(sign-up, log-in, and go to <strong>Grafana Dashboards</strong> --> <strong>FastAPI Дашборд - Бронирование отелей</strong>)</p>
-            <a href="http://{{ HOST_IP }}:3000/d/_eX4mpl312/fastapi-dashbord-bronirovanie-otelej?orgId=1&refresh=5s" target="_blank">
+            <a href="http://{{ host_ip }}:3000/d/_eX4mpl312/fastapi-dashbord-bronirovanie-otelej?orgId=1&refresh=5s" target="_blank">
                 Open Grafana Dashboard
             </a>
         </div>
@@ -150,19 +150,19 @@
             <div class="button-container">
                 <div class="horizontal-buttons">
                     <div class="button-wrapper">
-                        <a onclick="sendRequest('http://{{ HOST_IP }}:9000/prometheus/memory_consumer', 'spinner1')">
+                        <a onclick="sendRequest('http://{{ host_ip }}:9000/prometheus/memory_consumer', 'spinner1')">
                             Make memory-consuming query
                         </a>
                         <div id="spinner1" class="loading-spinner"></div>
                     </div>
                     <div class="button-wrapper">
-                        <a onclick="sendRequest('http://{{ HOST_IP }}:9000/prometheus/time_consumer', 'spinner2')">
+                        <a onclick="sendRequest('http://{{ host_ip }}:9000/prometheus/time_consumer', 'spinner2')">
                             Make time (and memory)-consuming query
                         </a>
                         <div id="spinner2" class="loading-spinner"></div>
                     </div>
                     <div class="button-wrapper">
-                        <a onclick="sendRequest('http://{{ HOST_IP }}:9000/prometheus/get_error', 'spinner3')" class="error">
+                        <a onclick="sendRequest('http://{{ host_ip }}:9000/prometheus/get_error', 'spinner3')" class="error">
                             Make queries that generate an error
                         </a>
                         <div id="spinner3" class="loading-spinner"></div>
