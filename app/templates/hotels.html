@@ -5,7 +5,7 @@
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Набронировал</title>
+    <title>Бронирование отелей</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -19,7 +19,7 @@
             padding: 20px;
         }
         .header {
-            margin-bottom: 30px;
+            margin-bottom: 50px;
         }
         .header h2 {
             margin-bottom: 10px;
@@ -31,14 +31,20 @@
             gap: 20px;
             margin-top: 20px;
         }
-        .button-wrapper {
+        .horizontal-buttons {
             display: flex;
-            align-items: center;
-            gap: 10px;
+            justify-content: space-between;
+            gap: 20px;
+        }
+        .button-wrapper {
+            flex: 1;
+            position: relative; /* Для абсолютного позиционирования индикатора */
         }
         .header a {
-            display: inline-block;
-            padding: 15px 20px; /* Увеличенный padding для большего пространства */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 15px 20px;
             text-decoration: none;
             color: white;
             background-color: #007bff;
@@ -47,10 +53,9 @@
             cursor: pointer;
             text-align: center;
             width: 100%;
-            max-width: 300px;
             box-sizing: border-box;
-            height: 60px; /* Увеличенная высота кнопки */
-            line-height: 20px; /* Вертикальное выравнивание текста */
+            height: 60px;
+            line-height: 1.2;
         }
         .header a:hover {
             background-color: #0056b3;
@@ -89,8 +94,11 @@
             margin-top: 50px;
             color: #777;
         }
-        /* Стили для индикаторов загрузки */
         .loading-spinner {
+            position: absolute;
+            bottom: -40px; /* Фиксированное положение под кнопкой */
+            left: 43%;
+            transform: translateX(-50%);
             display: none;
             border: 4px solid #f3f3f3;
             border-radius: 50%;
@@ -103,11 +111,14 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+        .button-container + h3 {
+            margin-top: 60px; /* Фиксированное расстояние от кнопок до заголовка списка отелей */
+        }
     </style>
     <script>
         function sendRequest(url, spinnerId) {
             const spinner = document.getElementById(spinnerId);
-            spinner.style.display = 'inline-block';  // Показываем индикатор загрузки
+            spinner.style.display = 'inline-block';
 
             fetch(url)
                 .then(response => {
@@ -119,7 +130,7 @@
                 })
                 .catch(error => console.error('Request error:', error))
                 .finally(() => {
-                    spinner.style.display = 'none';  // Скрываем индикатор загрузки
+                    spinner.style.display = 'none';
                 });
         }
     </script>
@@ -127,36 +138,40 @@
 <body>
     <div class="container">
         <div class="header">
-            <h2>Testing Grafana Dashboard</h2>
-            <p>Login: <strong>test</strong>, Password: <strong>test</strong></p>
-            <a href="http://127.0.0.1:3000/d/_eX4mpl312/fastapi-dashbord-bronirovanie-otelej" target="_blank">
+            <h3>Testing Grafana Dashboard</h3>
+            <p>(sign-up, log-in, and go to <strong>Grafana Dashboards</strong> --> <strong>FastAPI Дашборд - Бронирование отелей</strong>)</p>
+            <a href="http://127.0.0.1:3000/d/_eX4mpl312/fastapi-dashbord-bronirovanie-otelej?orgId=1&refresh=5s" target="_blank">
                 Open Grafana Dashboard
             </a>
         </div>
 
         <div class="header">
-            <h2>Make a number of clicks to display information in the Grafana dashboard:</h2>
+            <h3>Make a number of clicks to display information in the Grafana dashboard:</h3>
             <div class="button-container">
-                <div class="button-wrapper">
-                    <a onclick="sendRequest('http://127.0.0.1:9000/prometheus/memory_consumer', 'spinner1')">
-                        Make memory-consuming query
-                    </a>
-                    <div id="spinner1" class="loading-spinner"></div>
-                </div>
-                <div class="button-wrapper">
-                    <a onclick="sendRequest('http://127.0.0.1:9000/prometheus/time_consumer', 'spinner2')">
-                        Make time (and memory)-consuming query
-                    </a>
-                    <div id="spinner2" class="loading-spinner"></div>
-                </div>
-                <div class="button-wrapper">
-                    <a onclick="sendRequest('http://127.0.0.1:9000/prometheus/get_error', 'spinner3')" class="error">
-                        Make queries that generate an error
-                    </a>
-                    <div id="spinner3" class="loading-spinner"></div>
+                <div class="horizontal-buttons">
+                    <div class="button-wrapper">
+                        <a onclick="sendRequest('http://127.0.0.1:9000/prometheus/memory_consumer', 'spinner1')">
+                            Make memory-consuming query
+                        </a>
+                        <div id="spinner1" class="loading-spinner"></div>
+                    </div>
+                    <div class="button-wrapper">
+                        <a onclick="sendRequest('http://127.0.0.1:9000/prometheus/time_consumer', 'spinner2')">
+                            Make time (and memory)-consuming query
+                        </a>
+                        <div id="spinner2" class="loading-spinner"></div>
+                    </div>
+                    <div class="button-wrapper">
+                        <a onclick="sendRequest('http://127.0.0.1:9000/prometheus/get_error', 'spinner3')" class="error">
+                            Make queries that generate an error
+                        </a>
+                        <div id="spinner3" class="loading-spinner"></div>
+                    </div>
                 </div>
             </div>
         </div>
+
+        <h3>Пример вывода на фронтенд информации по запросу: "Список отелей со свободными комнатами на период с 26.08.2025 по 29.08.2025 в локации 'Алтай'"</h3>
 
         <div>
             {% if hotels %}
