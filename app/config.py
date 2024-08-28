@@ -14,6 +14,8 @@ class Settings(BaseSettings):
     LOG_LEVEL: Literal["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
     SENTRY_DSN: str
 
+    HOST_IP: str
+
     DB_HOST: str
     DB_PORT: int
     DB_USER: str

@@ -6,6 +6,7 @@ from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 
 from app.config import BASE_DIR
+from app.config import settings
 from app.hotels.router import get_hotels_by_location_and_time
 
 router = APIRouter(
@@ -20,8 +21,8 @@ templates = Jinja2Templates(directory=os.path.join(BASE_DIR, "app", "templates")
 async def get_hotels_page(
         request: Request,
         location: str,
-        date_from: date = Query(..., description=f"Например, {datetime.now().date()}"),
-        date_to: date =  Query(..., description=f"Например, {datetime.now().date()} + 14 days"),
+        date_from: date = Query(..., description=f"Например, {datetime.now().date()} - 1 days"),
+        date_to: date =  Query(..., description=f"Например, {datetime.now().date()} + 15 days"),
         hotels=Depends(get_hotels_by_location_and_time),
 ):
     return templates.TemplateResponse(
@@ -32,5 +33,6 @@ async def get_hotels_page(
             "location": location,
             "date_from": date_from.strftime("%Y-%m-%d"),
             "date_to": date_to.strftime("%Y-%m-%d"),
+            "HOST_IP": settings.HOST_IP,
         },
     )
