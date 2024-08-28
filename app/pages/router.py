@@ -1,5 +1,5 @@
 import os
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 
 from fastapi import APIRouter, Depends, Query, Request
 from fastapi.responses import HTMLResponse
@@ -17,6 +17,13 @@ router = APIRouter(
 templates = Jinja2Templates(directory=os.path.join(BASE_DIR, "app", "templates"))
 
 
+def get_default_dates():
+    today = datetime.now().date()
+    date_from_default = today + timedelta(days=2)
+    date_to_default = today + timedelta(days=12)
+    return date_from_default, date_to_default
+
+
 @router.get("/hotels", response_class=HTMLResponse)
 async def get_hotels_page(
         request: Request,
@@ -25,6 +32,7 @@ async def get_hotels_page(
         date_to: date =  Query(..., description=f"Например, {datetime.now().date()} + 12 days"),
         hotels=Depends(get_hotels_by_location_and_time),
 ):
+    dates: tuple[date, date] = Depends(get_default_dates),
     return templates.TemplateResponse(
         name="hotels.html",
         context={
