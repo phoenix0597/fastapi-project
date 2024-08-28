@@ -2,6 +2,7 @@ import os
 import time
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
+from prometheus_fastapi_instrumentator import Instrumentator
 
 import uvicorn
 from fastapi import FastAPI, Request
@@ -11,7 +12,6 @@ from fastapi_cache import FastAPICache
 from fastapi_cache.backends.redis import RedisBackend
 from redis import asyncio as aioredis
 from sqladmin import Admin
-from fastapi_cache.decorator import cache
 
 import sentry_sdk
 
@@ -24,6 +24,8 @@ from app.hotels.router import router as router_hotels
 from app.images.router import router as router_images
 from app.pages.router import router as router_pages
 from app.users.router import router as router_users
+from app.importer.router import router as router_importer
+from app.prometheus.router import router as router_prometheus
 from app.logger import logger
 
 sentry_sdk.init(
@@ -57,6 +59,15 @@ app.include_router(router_bookings)
 app.include_router(router_hotels)
 app.include_router(router_images)
 app.include_router(router_pages)
+app.include_router(router_importer)
+app.include_router(router_prometheus)
+
+instrumentator = Instrumentator(
+    should_group_status_codes=False,
+    excluded_handlers=[".*admin.*", "/metrics"],
+)
+
+instrumentator.instrument(app).expose(app, tags=["Метрики"])
 
 admin = Admin(app, engine, authentication_backend=authentication_backend)
 admin.add_view(UsersAdmin)
