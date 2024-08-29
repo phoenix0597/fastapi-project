@@ -35,7 +35,7 @@ class BookingsAdmin(ModelView, model=Bookings):
 
 class HotelsAdmin(ModelView, model=Hotels):
     column_list = [c.name for c in Hotels.__table__.c] + [Hotels.room]
-    # can_delete = False
+    can_delete = False
     name = "Отель"
     name_plural = "Отели"
     icon = "fa-solid fa-hotel"
@@ -45,7 +45,7 @@ class HotelsAdmin(ModelView, model=Hotels):
 
 class RoomsAdmin(ModelView, model=Rooms):
     column_list = [c.name for c in Rooms.__table__.c] + [Rooms.hotel, Rooms.booking]
-    # can_delete = False
+    can_delete = False
     name = "Комната"
     name_plural = "Комнаты"
     icon = "fa-solid fa-bed"
