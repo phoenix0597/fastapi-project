@@ -22,11 +22,11 @@ async def get_hotels_page(
         request: Request,
         location: str,
         date_from: date = Query(
-            # default=(datetime.now().date() + timedelta(days=2)).strftime("%Y-%m-%d"),
+            default=(datetime.now().date() + timedelta(days=2)).strftime("%Y-%m-%d"),
             description=f"Дата начала, например, {(datetime.now().date() + timedelta(days=2)).strftime('%Y-%m-%d')}"
         ),
         date_to: date = Query(
-            # default=(datetime.now().date() + timedelta(days=12)).strftime("%Y-%m-%d"),
+            default=(datetime.now().date() + timedelta(days=12)).strftime("%Y-%m-%d"),
             description=f"Дата окончания, например, {(datetime.now().date() + timedelta(days=12)).strftime('%Y-%m-%d')}"
         ),
         hotels=Depends(get_hotels_by_location_and_time),
