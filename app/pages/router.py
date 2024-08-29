@@ -17,22 +17,22 @@ router = APIRouter(
 templates = Jinja2Templates(directory=os.path.join(BASE_DIR, "app", "templates"))
 
 
-def get_default_dates():
-    today = datetime.now().date()
-    date_from_default = today + timedelta(days=2)
-    date_to_default = today + timedelta(days=12)
-    return date_from_default, date_to_default
-
-
 @router.get("/hotels", response_class=HTMLResponse)
 async def get_hotels_page(
         request: Request,
         location: str,
-        date_from: date = Query(..., description=f"Например, {datetime.now().date()} + 2 days"),
-        date_to: date =  Query(..., description=f"Например, {datetime.now().date()} + 12 days"),
+        date_from: date = Query(
+            # default=(datetime.now().date() + timedelta(days=2)).strftime("%Y-%m-%d"),
+            description=f"Дата начала, например, {(datetime.now().date() + timedelta(days=2)).strftime('%Y-%m-%d')}"
+        ),
+        date_to: date = Query(
+            # default=(datetime.now().date() + timedelta(days=12)).strftime("%Y-%m-%d"),
+            description=f"Дата окончания, например, {(datetime.now().date() + timedelta(days=12)).strftime('%Y-%m-%d')}"
+        ),
         hotels=Depends(get_hotels_by_location_and_time),
 ):
-    dates: tuple[date, date] = Depends(get_default_dates),
+
+    # date_from, date_to = dates
     return templates.TemplateResponse(
         name="hotels.html",
         context={
