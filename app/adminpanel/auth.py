@@ -1,4 +1,3 @@
-# from sqladmin import Admin
 from typing import Optional
 
 from sqladmin.authentication import AuthenticationBackend
@@ -42,7 +41,8 @@ class AdminAuth(AuthenticationBackend):
         if not user:
             return RedirectResponse(request.url_for("admin:login"), status_code=302)
 
-        return True
+        # return True
+        return None
 
 
 authentication_backend = AdminAuth(secret_key="...")
