@@ -1,0 +1,23 @@
+name: Image dependency checks
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  image-dependencies:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - name: Build the project image
+        run: docker build --tag booking-pillow-check .
+      - name: Check dependency compatibility
+        run: docker run --rm --network none booking-pillow-check python -m pip check
+      - name: Check GIF security regression and image task
+        run: docker run --rm --network none booking-pillow-check python -B -m unittest discover -s tests -v
